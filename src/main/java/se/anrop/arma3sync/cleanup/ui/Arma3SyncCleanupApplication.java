@@ -6,6 +6,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.aerofx.AeroFX;
 import se.anrop.arma3sync.cleanup.viewmodels.ListViewModel;
 
 import java.io.IOException;
@@ -27,6 +28,9 @@ public class Arma3SyncCleanupApplication extends Application {
         this.listView.setItems(this.viewModel.getFolders());
 
         BorderPane root = new BorderPane(this.listView);
+        AeroFX.style();
+        AeroFX.styleAllAsGroupBox(root);
+        
         Scene scene = new Scene(root, 400, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Arma3Sync Cleanup");
