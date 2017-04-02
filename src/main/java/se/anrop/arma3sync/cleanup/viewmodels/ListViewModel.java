@@ -4,8 +4,8 @@ import fr.soe.a3s.domain.repository.SyncTreeDirectory;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ListView;
-import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.util.Callback;
 import se.anrop.arma3sync.cleanup.Constants;
 import se.anrop.arma3sync.cleanup.utils.Arma3Folder;
@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
  */
 public class ListViewModel implements Callback<String, ObservableValue<Boolean>> {
 
-    private ListView listView;
+    private ObservableList<String> folders = FXCollections.observableArrayList();
 
-    public ListViewModel(ListView listView) {
-        this.listView = listView;
-        this.listView.setCellFactory(CheckBoxListCell.forListView(this));
+    public ListViewModel() {
         refresh();
     }
 
@@ -42,6 +40,10 @@ public class ListViewModel implements Callback<String, ObservableValue<Boolean>>
         }
     }
 
+    public ObservableList<String> getFolders() {
+        return folders;
+    }
+
     private void loadData() throws ClassNotFoundException, IOException {
         URL url = new URL(Constants.ANROP_ARMA3SYNC_REPOSITORY_SYNC_PATH);
         SyncTreeDirectory sync = Arma3Sync.readSyncFile(url);
@@ -52,7 +54,7 @@ public class ListViewModel implements Callback<String, ObservableValue<Boolean>>
         folders.addAll(localFolders);
         folders.removeAll(remoteFolders);
 
-        this.listView.getItems().setAll(folders.stream().sorted().collect(Collectors.toList()));
+        this.folders.setAll(folders.stream().sorted().collect(Collectors.toList()));
     }
 
     @Override
