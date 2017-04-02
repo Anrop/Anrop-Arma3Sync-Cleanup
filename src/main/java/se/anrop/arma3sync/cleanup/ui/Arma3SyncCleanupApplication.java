@@ -29,6 +29,7 @@ public class Arma3SyncCleanupApplication extends Application {
         BorderPane root = new BorderPane(this.listView);
         Scene scene = new Scene(root, 400, 600);
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Arma3Sync Cleanup");
         primaryStage.show();
     }
 }
