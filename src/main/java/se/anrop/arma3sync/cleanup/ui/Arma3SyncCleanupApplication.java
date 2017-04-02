@@ -27,7 +27,7 @@ public class Arma3SyncCleanupApplication extends Application {
         this.listView.setItems(this.viewModel.getFolders());
 
         BorderPane root = new BorderPane(this.listView);
-        Scene scene = new Scene(root, 250, 400);
+        Scene scene = new Scene(root, 400, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
