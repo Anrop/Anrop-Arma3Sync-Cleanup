@@ -95,6 +95,7 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
     @Override
     public ObservableValue<Boolean> call(ModFolder item) {
         BooleanProperty observable = new SimpleBooleanProperty();
+        observable.set(this.selectedFolders.contains(item));
         observable.addListener((obs, wasSelected, isNowSelected) -> {
                     if (isNowSelected) {
                         this.selectedFolders.add(item);
