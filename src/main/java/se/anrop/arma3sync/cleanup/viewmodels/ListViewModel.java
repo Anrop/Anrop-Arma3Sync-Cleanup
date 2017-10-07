@@ -84,6 +84,11 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
             return new ModFolder(folder);
         }).collect(Collectors.toList());
 
+        modFolders.stream().forEach(mod -> {
+            File modFolder = Paths.get(armaFolder.getAbsolutePath(), mod.getName()).toFile();
+            mod.setSize(FileUtils.sizeOf(modFolder));
+        });
+
         this.folders.setAll(modFolders);
     }
 
