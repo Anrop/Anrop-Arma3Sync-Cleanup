@@ -10,6 +10,7 @@ import javafx.collections.ObservableSet;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import se.anrop.arma3sync.cleanup.Constants;
+import se.anrop.arma3sync.cleanup.models.ModFolder;
 import se.anrop.arma3sync.cleanup.utils.Arma3Folder;
 import se.anrop.arma3sync.cleanup.utils.Arma3Registry;
 import se.anrop.arma3sync.cleanup.utils.Arma3Sync;
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
 /**
  * Created by bjorn on 2017-02-05.
  */
-public class ListViewModel implements Callback<String, ObservableValue<Boolean>> {
+public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolean>> {
 
-    private ObservableList<String> folders = FXCollections.observableArrayList();
-    private ObservableSet<String> selectedFolders = FXCollections.observableSet();
+    private ObservableList<ModFolder> folders = FXCollections.observableArrayList();
+    private ObservableSet<ModFolder> selectedFolders = FXCollections.observableSet();
     private File armaFolder;
 
     public ListViewModel() {
@@ -46,17 +47,17 @@ public class ListViewModel implements Callback<String, ObservableValue<Boolean>>
         }
     }
 
-    public ObservableList<String> getFolders() {
+    public ObservableList<ModFolder> getFolders() {
         return folders;
     }
 
-    public ObservableSet<String> getSelectedFolders() {
+    public ObservableSet<ModFolder> getSelectedFolders() {
         return selectedFolders;
     }
 
     public void deleteSelectedFolders() {
-        for (String mod : getSelectedFolders()) {
-            File modFolder = Paths.get(armaFolder.getAbsolutePath(), mod).toFile();
+        for (ModFolder mod : getSelectedFolders()) {
+            File modFolder = Paths.get(armaFolder.getAbsolutePath(), mod.getName()).toFile();
             if (modFolder.exists()) {
                 try {
                     FileUtils.deleteDirectory(modFolder);
@@ -79,11 +80,15 @@ public class ListViewModel implements Callback<String, ObservableValue<Boolean>>
         folders.addAll(localFolders);
         folders.removeAll(remoteFolders);
 
-        this.folders.setAll(folders.stream().sorted().collect(Collectors.toList()));
+        List<ModFolder> modFolders = folders.stream().sorted().map(folder -> {
+            return new ModFolder(folder);
+        }).collect(Collectors.toList());
+
+        this.folders.setAll(modFolders);
     }
 
     @Override
-    public ObservableValue<Boolean> call(String item) {
+    public ObservableValue<Boolean> call(ModFolder item) {
         BooleanProperty observable = new SimpleBooleanProperty();
         observable.addListener((obs, wasSelected, isNowSelected) -> {
                     if (isNowSelected) {
