@@ -3,6 +3,8 @@ package se.anrop.arma3sync.cleanup.viewmodels;
 import fr.soe.a3s.domain.repository.SyncTreeDirectory;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,15 +32,19 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
 
     private ObservableList<ModFolder> folders = FXCollections.observableArrayList();
     private ObservableSet<ModFolder> selectedFolders = FXCollections.observableSet();
-    private File armaFolder;
+    private SimpleStringProperty modsFolder = new SimpleStringProperty();
 
     public ListViewModel() {
-        refresh();
+        this.modsFolder.addListener((observable, oldValue, newValue) -> refresh());
+        loadPathFromRegistry();
+    }
+
+    public StringProperty modsFolder() {
+        return this.modsFolder;
     }
 
     public void refresh() {
         try {
-            this.armaFolder = new File(Arma3Registry.getPath());
             loadData();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -57,7 +63,7 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
 
     public void deleteSelectedFolders() {
         for (ModFolder mod : getSelectedFolders()) {
-            File modFolder = Paths.get(armaFolder.getAbsolutePath(), mod.getName()).toFile();
+            File modFolder = Paths.get(modsFolder.get(), mod.getName()).toFile();
             if (modFolder.exists()) {
                 try {
                     FileUtils.deleteDirectory(modFolder);
@@ -70,11 +76,15 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
         refresh();
     }
 
+    private void loadPathFromRegistry() {
+        modsFolder.set(Arma3Registry.getPath());
+    }
+
     private void loadData() throws ClassNotFoundException, IOException {
         URL url = new URL(Constants.ANROP_ARMA3SYNC_REPOSITORY_SYNC_PATH);
         SyncTreeDirectory sync = Arma3Sync.readSyncFile(url);
         List<String> remoteFolders = sync.getList().stream().map(node -> node.getName().toLowerCase()).collect(Collectors.toList());
-        List<String> localFolders = Arma3Folder.getFolders(armaFolder).stream().map(node -> node.toLowerCase()).collect(Collectors.toList());
+        List<String> localFolders = Arma3Folder.getFolders(new File(modsFolder.get())).stream().map(node -> node.toLowerCase()).collect(Collectors.toList());
 
         HashSet<String> folders = new HashSet<>();
         folders.addAll(localFolders);
@@ -85,7 +95,7 @@ public class ListViewModel implements Callback<ModFolder, ObservableValue<Boolea
         }).collect(Collectors.toList());
 
         modFolders.stream().forEach(mod -> {
-            File modFolder = Paths.get(armaFolder.getAbsolutePath(), mod.getName()).toFile();
+            File modFolder = Paths.get(modsFolder.get(), mod.getName()).toFile();
             mod.setSize(FileUtils.sizeOf(modFolder));
         });
 
