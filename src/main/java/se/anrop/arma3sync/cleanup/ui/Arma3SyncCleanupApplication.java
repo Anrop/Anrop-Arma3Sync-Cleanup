@@ -38,7 +38,9 @@ public class Arma3SyncCleanupApplication extends Application {
         this.chooseFolderButton = new Button("Choose mods folder");
         this.chooseFolderButton.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File(this.viewModel.modsFolder().get()));
+            if (this.viewModel.modsFolder().get() != null) {
+                directoryChooser.setInitialDirectory(new File(this.viewModel.modsFolder().get()));
+            }
             File selectedDirectory = directoryChooser.showDialog(primaryStage);
             this.viewModel.modsFolder().set(selectedDirectory.getAbsolutePath());
         });
