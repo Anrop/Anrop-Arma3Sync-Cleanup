@@ -27,6 +27,8 @@ public class Arma3Registry {
                 }
             } catch (RegistryException e) {
                 //e.printStackTrace();
+            } catch (Throwable e) {
+                // Support for non Windows platforms
             }
         }
 
